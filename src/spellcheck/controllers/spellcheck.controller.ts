@@ -10,12 +10,11 @@ export class SpellcheckController {
     suggestions: string[];
     correct: boolean;
   } {
-    const result = this.spellcheckService.spellcheckWord(word);
+    const { suggestions, correct } = this.spellcheckService.checkWord(word);
 
-    if (result.correct) {
-      return { suggestions: [], correct: true };
-    } else {
-      return { suggestions: result.suggestions, correct: false };
-    }
+    return {
+      suggestions: Array.from(suggestions),
+      correct,
+    };
   }
 }
