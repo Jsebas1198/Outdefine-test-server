@@ -36,4 +36,4 @@ This will start the NestJS application in your local development environment. Th
 
 ### Spellchecking Endpoint:
 - Endpoint: /spell/:word
-- Example: http://localhost:3000/spell/word
+- Example: http://localhost:31337/spell/word
