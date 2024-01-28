@@ -13,7 +13,7 @@ RUN npm install
 # Copy the rest of the application code to the container
 COPY . .
 
-# Expose the port your app runs on
+# Expose the port of the app
 EXPOSE 31337
 
 # Command to run your application in development mode
