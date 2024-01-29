@@ -24,6 +24,14 @@ npm install
 
 There is no additional configuration required for this app. Ensure that the **assets/dictionary.txt** file is available for spellchecking.
 
+## Swagger Documentation
+
+Explore the API endpoints and test functionality using Swagger documentation.
+
+1. After running the application locally, open your web browser and go to http://localhost:31337/docs.
+
+2. Swagger provides a user-friendly interface to interact with API endpoints, view request/response details, and test the API.
+
 ## Execution
 
 Once you have completed the installation and configuration, you can run the application locally using the following command:
