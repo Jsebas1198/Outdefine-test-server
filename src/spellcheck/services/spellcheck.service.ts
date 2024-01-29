@@ -16,22 +16,27 @@ export class SpellcheckService {
 
   /**
    * Loads the dictionary from the specified file path and populates the dictionary set.
-   *
    */
-  private loadDictionary(): void {
+  private loadDictionary = async (): Promise<void> => {
     try {
-      const dictionaryContent = fs.readFileSync(
+      const dictionaryContent = await fs.promises.readFile(
         this.DICTIONARY_FILE_PATH,
         'utf-8',
       );
       this.dictionary = new Set(
-        dictionaryContent.split('\n').map((word) => word.trim().toLowerCase()),
+        dictionaryContent.trim().toLowerCase().split('\n'),
       );
     } catch (error) {
       console.error('Error reading dictionary file:', error);
     }
-  }
+  };
 
+  /**
+   * Check if the word is valid.
+   *
+   * @param {string} word - the word to be checked
+   * @return {boolean} true if the word is in the dictionary, false otherwise
+   */
   private isValidWord(word: string): boolean {
     return this.dictionary.has(word);
   }
@@ -62,7 +67,7 @@ export class SpellcheckService {
       throw new NotFoundException('Word not found');
     }
 
-    return { suggestions: Array.from(suggestions), correct: false };
+    return { suggestions: [...suggestions], correct: false };
   }
 
   /**
@@ -88,11 +93,13 @@ export class SpellcheckService {
    * @return {number} the Levenshtein distance between the two strings
    */
   private levenshteinDistance(a: string, b: string): number {
-    const dp = Array.from({ length: a.length + 1 }, (_, i) =>
-      Array.from({ length: b.length + 1 }, (_, j) =>
-        i === 0 ? j : j === 0 ? i : 0,
-      ),
-    );
+    const dp = Array(a.length + 1)
+      .fill(0)
+      .map((_, i) =>
+        Array(b.length + 1)
+          .fill(0)
+          .map((_, j) => (i === 0 ? j : j === 0 ? i : 0)),
+      );
 
     for (let i = 1; i <= a.length; i++) {
       for (let j = 1; j <= b.length; j++) {
@@ -119,25 +126,18 @@ export class SpellcheckService {
 
     for (const dictWord of this.dictionary) {
       const distance = this.levenshteinDistance(word, dictWord);
-      if (distance <= 2) {
-        suggestions.push({ word: dictWord, distance });
-      }
+      suggestions.push({ word: dictWord, distance });
     }
 
-    // Sort suggestions by distance
-    suggestions.sort((a, b) => a.distance - b.distance);
-
-    // Filter suggestions to include only words with the smallest distance
-    const minDistance =
-      suggestions.length > 0 ? suggestions[0].distance : Infinity;
-    const filteredSuggestions = suggestions.filter(
-      (suggestion) => suggestion.distance === minDistance,
+    // Find the minimum distance
+    const minDistance = Math.min(
+      ...suggestions.map((suggestion) => suggestion.distance),
     );
 
-    // Extract words from filtered suggestions
-    const resultSuggestions = filteredSuggestions.map(
-      (suggestion) => suggestion.word,
-    );
+    // Collect suggestions with the minimum distance
+    const resultSuggestions = suggestions
+      .filter((suggestion) => suggestion.distance === minDistance)
+      .map((suggestion) => suggestion.word);
 
     return resultSuggestions;
   }
